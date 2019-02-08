@@ -1,8 +1,17 @@
 # hive-spark-ddl-converter
 
 Converts Hive DDL to Spark DDL.
+This is a first-pass Hive-to-Spark DDL converter.
 
-## Example
+## Build
+
+```
+mvn package
+```
+
+Test report: [target/surefire-reports/index.html](target/surefire-reports/index.html).
+
+## Run Example
 ```
 spark-submit --class org.amm.spark.sql.ConvertHiveFile --master local[2] \
   target/hive-spark-ddl-converter-1.0-SNAPSHOT.jar \
