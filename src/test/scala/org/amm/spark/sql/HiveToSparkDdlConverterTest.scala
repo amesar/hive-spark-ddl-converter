@@ -29,18 +29,23 @@ class HiveToSparkDdlConverterTest {
     equals(sparkDdlRef,sparkDdl)
   }
 
+  def getDdlFiles(d1: File, d2: String) = {
+    val files = new File(d1,d2).listFiles().filter(x => { x.isFile && x.getName.endsWith(".ddl") })
+    TestNgUtils.buildDataProviderArray(files)
+  }
+
   @DataProvider(name= "okFiles")
-  def okFiles = TestNgUtils.buildDataProviderArray(new File(hiveDir,"ok").listFiles())
+  def okFiles = getDdlFiles(hiveDir,"ok")
   @Test(dataProvider = "okFiles")
   def testOkFile(file: File) = testFile(file)
 
   @DataProvider(name= "badFiles")
-  def badFiles = TestNgUtils.buildDataProviderArray(new File(hiveDir,"bad").listFiles())
+  def badFiles = getDdlFiles(hiveDir,"bad")
   @Test(dataProvider = "badFiles", expectedExceptions = Array(classOf[Exception]))
   def testBadFile(file: File) = testFile(file)
 
   @DataProvider(name= "notyetFiles")
-  def notyetFiles = TestNgUtils.buildDataProviderArray(new File(hiveDir,"notyet").listFiles())
+  def notyetFiles = getDdlFiles(hiveDir,"notyet")
   @Test(dataProvider = "notyetFiles", expectedExceptions = Array(classOf[Exception]))
   def testNotyetFile(file: File) = testFile(file)
 }
