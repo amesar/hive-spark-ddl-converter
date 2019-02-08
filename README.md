@@ -38,3 +38,10 @@ USING PARQUET
 PARTITIONED BY (day)
 LOCATION '/tmp/simple'
 ```
+
+## DDL Files
+
+* Hive files that can be converted: [src/test/resources/hive_ddl/ok](src/test/resources/hive_ddl/ok)
+  * Spark equivalents: [src/test/resources/spark_ddl](src/test/resources/spark_ddl)
+* Hive files that can't yet be converted: [src/test/resources/hive_ddl/notyet](src/test/resources/hive_ddl/notyet)
+
