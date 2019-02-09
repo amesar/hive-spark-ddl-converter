@@ -6,4 +6,5 @@ CREATE table IF NOT EXISTS `parquet_test` (
   strct struct<A:string,B:string>,
   part string)
 USING PARQUET
+OPTIONS ('SERDE' = 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'INPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'OUTPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat')
 PARTITIONED BY (part)

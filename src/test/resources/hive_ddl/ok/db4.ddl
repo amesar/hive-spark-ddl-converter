@@ -1,0 +1,4 @@
+CREATE TABLE db_table4 (name STRING, age INT)
+    COMMENT 'This table uses the CSV format'
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    STORED AS TEXTFILE
