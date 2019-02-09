@@ -11,13 +11,14 @@ class HiveToSparkDdlConverterTest {
   println(s"spark.version: ${spark.version}")
   val hiveDir = new File("src/test/resources/hive_ddl")
   val sparkDir = new File("src/test/resources/spark_ddl")
+  val verbose = true
 
   def testFile(file: File) {
     println(s"==== file: $file")
     val hiveDdl = Source.fromFile(file.getAbsolutePath).mkString
     println(s"hiveDdl:\n$hiveDdl")
 
-    val sparkDdl = HiveToSparkDdlConverter.convert(hiveDdl)
+    val sparkDdl = HiveToSparkDdlConverter.convert(hiveDdl,verbose)
     println(s"sparkDdl:\n$sparkDdl")
 
     val sparkDdl2 = HiveToSparkDdlConverter.getTableDesc(sparkDdl)
