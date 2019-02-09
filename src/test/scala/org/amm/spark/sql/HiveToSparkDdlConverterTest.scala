@@ -23,10 +23,15 @@ class HiveToSparkDdlConverterTest {
     val sparkDdl2 = HiveToSparkDdlConverter.getTableDesc(sparkDdl)
     println(s"sparkDdl2:\n$sparkDdl2")
 
-    val sparkDdlRef = Source.fromFile(new File(sparkDir,file.getName)).mkString
-    println(s"sparkDdlRef:\n$sparkDdlRef")
-
-    equals(sparkDdlRef,sparkDdl)
+    val sparkPath = new File(sparkDir,file.getName)
+    if (sparkPath.exists) {
+      val sparkDdlRef = Source.fromFile(sparkPath).mkString
+      //val sparkDdlRef = Source.fromFile(new File(sparkDir,file.getName)).mkString
+      println(s"sparkDdlRef:\n$sparkDdlRef")
+      equals(sparkDdlRef,sparkDdl)
+    } else {
+      println(s"WARNING: No $sparkPath for $file")
+    }
   }
 
   def getDdlFiles(d1: File, d2: String) = {
