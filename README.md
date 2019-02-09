@@ -18,7 +18,8 @@ Test report: [target/surefire-reports/index.html](target/surefire-reports/index.
 ```
 spark-submit --class org.amm.spark.sql.ConvertHiveFile --master local[2] \
   target/hive-spark-ddl-converter-1.0-SNAPSHOT.jar \
-  src/test/resources/hive_ddl/ok/simple_parquet.ddl
+  --hiveFile src/test/resources/hive_ddl/ok/simple_parquet.ddl \
+  --sparkOutputDir .
 ```
 
 HIVE DDL
@@ -46,17 +47,12 @@ LOCATION '/tmp/simple'
 
 Converts a directory containing Hive DDL files to Spark DDL files.
 
-Arguments:
-* Input Hive DDL directory
-* Output Spark DDL directory
-* extension for DDL files
-
 ```
 spark-submit --class org.amm.spark.sql.ConvertHiveDirectory --master local[2] \
   target/hive-spark-ddl-converter-1.0-SNAPSHOT.jar \
-  src/test/resources/hive_ddl/ok \
-  out \
-  ddl
+  --hiveInputDir src/test/resources/hive_ddl/ok \
+  --sparkOutputDir out \
+  --extension ddl
 ```
 
 ```

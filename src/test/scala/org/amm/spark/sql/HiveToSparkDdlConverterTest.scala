@@ -26,7 +26,6 @@ class HiveToSparkDdlConverterTest {
     val sparkPath = new File(sparkDir,file.getName)
     if (sparkPath.exists) {
       val sparkDdlRef = Source.fromFile(sparkPath).mkString
-      //val sparkDdlRef = Source.fromFile(new File(sparkDir,file.getName)).mkString
       println(s"sparkDdlRef:\n$sparkDdlRef")
       equals(sparkDdlRef,sparkDdl)
     } else {

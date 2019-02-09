@@ -29,7 +29,7 @@ object HiveToSparkDdlConverter {
   def fmtUsing(serde: Option[String], provider: Option[String], serdeMap: Map[String,String]) : String = {
     val opt = _fmtUsing(serde, provider, serdeMap)
     opt match {
-      case Some(s) => "USING "+s+"\n"
+      case Some(s) => s"USING $s\n"
       case None => ""
     }
   }
@@ -101,7 +101,6 @@ object HiveToSparkDdlConverter {
       .append("(\n"+fmtColumns(desc.schema)+")\n")
       .append(fmtComment(desc.comment))
       .append(fmtUsing(desc.storage.serde,desc.provider,serdeMap))
-      //.append("USING "+fmtUsing(desc.storage.serde,desc.provider,serdeMap)+"\n")
       .append(fmtProperties(desc.storage.properties))
       .append(fmtPartitionColumnNames(desc.partitionColumnNames))
       .append(fmtLocation(desc.storage.locationUri))
