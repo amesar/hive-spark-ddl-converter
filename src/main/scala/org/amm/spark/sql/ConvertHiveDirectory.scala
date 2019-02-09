@@ -3,16 +3,14 @@ package org.amm.spark.sql
 import java.io.File
 import scala.io.Source
 import org.apache.spark.sql.SparkSession
+import com.beust.jcommander.{JCommander, Parameter}
 
 object ConvertHiveDirectory {
 
   def main(args: Array[String]) {
-    if (args.size < 3) {
-      println("ERROR: Expecting HIVE_DDL_DIRECTORY SPARK_DDL_OUTPUT_DIRECTORY EXTENSION VERBOSE")
-      System.exit(1)
-    }
-    val verbose = if (args.size > 3) args(3).toBoolean else false
-    convert(args(0), args(1),  args(2), verbose)
+    val opts = new Options()
+    new JCommander(opts, args.toArray: _*)
+    convert(opts.hiveInputDir, opts.sparkOutputDir, opts.extension, opts.verbose)
   }
 
   def convert(hiveDirname: String, sparkDirname: String, extension: String, verbose: Boolean) {
@@ -43,5 +41,19 @@ object ConvertHiveDirectory {
       println(s"  sparkFile: $sparkFile")
       new java.io.PrintWriter(sparkFile) { write(sparkDDL) ; close }
     }
+  }
+
+  class Options {
+    @Parameter(names = Array("--hiveInputDir" ), description = "hiveInputDir", required=true)
+    var hiveInputDir = "."
+
+    @Parameter(names = Array("--sparkOutputDir" ), description = "sparkOutputDir", required=true)
+    var sparkOutputDir = "."
+
+    @Parameter(names = Array("--extension" ), description = "extension", required=false)
+    var extension = "ddl"
+
+    @Parameter(names = Array("--verbose" ), description = "verbose", required=false)
+    var verbose = false
   }
 }
