@@ -7,7 +7,6 @@ import org.apache.spark.sql.execution.datasources.CreateTable
 import org.apache.spark.sql.catalyst.catalog._
 import org.apache.spark.sql.SaveMode
 import scala.collection.JavaConversions._
-import scala.io.Source
 
 object HiveToSparkDdlConverter {
 
@@ -75,16 +74,11 @@ object HiveToSparkDdlConverter {
     }
   }
 
-  def readSerdeMap(path: String) = {
-    val lines = Source.fromFile(path).getLines.toSeq
-    lines.map(x => (x.split(" ")(0), x.split(" ")(1))).toMap
-  }
-
   def _convert(hiveDDL: String, verbose: Boolean = false) : (CatalogTable,String) = {
     val desc = getTableDesc(hiveDDL)
     if (verbose) println(s"==== DESC:\n$desc")
     if (desc.provider.get.toLowerCase != "hive") {
-      if (verbose) println(s"WARNING: table ${desc.identifier} is not in Hive format")
+      if (verbose) println(s"WARNING: table ${desc.identifier} is not in Hive format - provider=${desc.provider}")
       return (desc,hiveDDL)
     }
 
@@ -93,16 +87,23 @@ object HiveToSparkDdlConverter {
 
     val using = fmtUsing(desc.storage.serde,desc.provider,serdeMap)
     sparkDDL.append(s"USING $using\n")
-    val map = if (desc.storage.properties.size > 0) desc.storage.properties else
-      Map("SERDE" -> desc.storage.serde.get, 
-          "INPUTFORMAT" -> desc.storage.inputFormat.get,
-          "OUTPUTFORMAT" -> desc.storage.outputFormat.get)
-    sparkDDL.append(fmtProperties(map))
+    if (using == "HIVE") {
+      val map = if (desc.storage.properties.size > 0) desc.storage.properties else
+        Map("SERDE" -> desc.storage.serde.get, 
+            "INPUTFORMAT" -> desc.storage.inputFormat.get,
+            "OUTPUTFORMAT" -> desc.storage.outputFormat.get)
+      sparkDDL.append(fmtProperties(map))
+    } else {
+      val exclude = Set("SERDE","INPUTFORMAT","OUTPUTFORMAT")
+      val props = desc.storage.properties.filterKeys(! exclude.contains(_))
+      sparkDDL.append(fmtProperties(props))
+    }
 
     sparkDDL
       .append(fmtPartitionColumnNames(desc.partitionColumnNames))
       .append(fmtLocation(desc.storage.locationUri))
       .append(fmtComment(desc.comment))
+
     (desc,sparkDDL.toString)
   }
 

@@ -26,6 +26,7 @@ object ConvertHiveFile {
     println(s"==== SparkDDL:\n\n$sparkDDL")
 
     if (opts.parseSpark) {
+      println(s"==== Parsing generated Spark DDL to validate if legal")
       val sparkDDL2 = HiveToSparkDdlConverter.convert(sparkDDL,opts.verbose)
       println(s"==== sparkDDL2:\n$sparkDDL2")
     }

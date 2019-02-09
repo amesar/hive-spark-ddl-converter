@@ -10,6 +10,5 @@ CREATE table IF NOT EXISTS `simple` (
   vch string,
   day int)
 USING PARQUET
-OPTIONS ('SERDE' = 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'INPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'OUTPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat')
 PARTITIONED BY (day)
 LOCATION '/tmp/simple'

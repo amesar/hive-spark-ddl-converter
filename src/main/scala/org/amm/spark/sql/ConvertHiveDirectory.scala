@@ -13,7 +13,7 @@ object ConvertHiveDirectory {
     convert(opts.hiveInputDir, opts.sparkOutputDir, opts.extension, opts.verbose)
   }
 
-  def convert(hiveDirname: String, sparkDirname: String, extension: String, verbose: Boolean) {
+  def convert(hiveDirname: String, sparkDirname: String, extension: String = "ddl", verbose: Boolean = false) {
     val hiveDir = new File(hiveDirname)
     val sparkDir = new File(sparkDirname)
     println("Arguments:")

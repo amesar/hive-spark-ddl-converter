@@ -18,6 +18,5 @@ CREATE table IF NOT EXISTS `customer_part` (
   c_last_review_date string,
   c_birth_month int)
 USING PARQUET
-OPTIONS ('SERDE' = 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe', 'INPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat', 'OUTPUTFORMAT' = 'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat')
 PARTITIONED BY (c_birth_month)
 LOCATION 's3:/tables/customer_part'
