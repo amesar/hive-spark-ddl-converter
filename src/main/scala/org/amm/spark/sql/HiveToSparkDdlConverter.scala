@@ -90,7 +90,6 @@ object HiveToSparkDdlConverter {
 
     val sparkDDL = new StringBuilder(s"CREATE table IF NOT EXISTS ${desc.identifier} ")
       .append("(\n"+fmtColumns(desc.schema)+")\n")
-      .append(fmtComment(desc.comment))
 
     val using = fmtUsing(desc.storage.serde,desc.provider,serdeMap)
     sparkDDL.append(s"USING $using\n")
@@ -103,6 +102,7 @@ object HiveToSparkDdlConverter {
     sparkDDL
       .append(fmtPartitionColumnNames(desc.partitionColumnNames))
       .append(fmtLocation(desc.storage.locationUri))
+      .append(fmtComment(desc.comment))
     (desc,sparkDDL.toString)
   }
 
