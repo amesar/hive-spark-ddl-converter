@@ -16,7 +16,6 @@ object HiveToSparkDdlConverter {
     "parquet.hive.serde.ParquetHiveSerDe" -> "PARQUET", // hive 12
     "org.apache.hadoop.hive.ql.io.orc.OrcSerde" -> "ORC",
     "org.apache.hadoop.hive.serde2.OpenCSVSerde" -> "CSV"
-    //"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe" -> "TODO"
   )
 
   def getTableDesc(sql: String): CatalogTable = {
@@ -27,21 +26,13 @@ object HiveToSparkDdlConverter {
   }
 
   def fmtUsing(serde: Option[String], provider: Option[String], serdeMap: Map[String,String]) : String = {
-    val opt = _fmtUsing(serde, provider, serdeMap)
-    opt match {
-      case Some(s) => s"USING $s\n"
-      case None => ""
-    }
-  }
-
-  def _fmtUsing(serde: Option[String], provider: Option[String], serdeMap: Map[String,String]) : Option[String] = {
     serde match {
-      case Some(serde)  => { 
+      case Some(serde) => { 
         if (serde == "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe") {
-          return None
+          return "HIVE"
         }
         serdeMap.get(serde) match {
-          case Some(format) => return Some(format)
+          case Some(format) => return format
           case None => throw new Exception(s"Unknown FORMAT SERDE: $serde")
         }
       }
@@ -49,8 +40,7 @@ object HiveToSparkDdlConverter {
         provider match {
           case Some(a) => {
             a match {
-              case "HIVE" => Some("HIVE")
-              case "org.apache.hadoop.hive.serde2.OpenCSVSerde" => Some("CSV")
+              case "HIVE" => "HIVE"
               case _ => throw new Exception(s"Unknown Provider $provider") // TODO
             }}
           case None => throw new Exception(s"No Provider") // TODO
@@ -97,11 +87,20 @@ object HiveToSparkDdlConverter {
       if (verbose) println(s"WARNING: table ${desc.identifier} is not in Hive format")
       return (desc,hiveDDL)
     }
+
     val sparkDDL = new StringBuilder(s"CREATE table IF NOT EXISTS ${desc.identifier} ")
       .append("(\n"+fmtColumns(desc.schema)+")\n")
       .append(fmtComment(desc.comment))
-      .append(fmtUsing(desc.storage.serde,desc.provider,serdeMap))
-      .append(fmtProperties(desc.storage.properties))
+
+    val using = fmtUsing(desc.storage.serde,desc.provider,serdeMap)
+    sparkDDL.append(s"USING $using\n")
+    val map = if (desc.storage.properties.size > 0) desc.storage.properties else
+      Map("SERDE" -> desc.storage.serde.get, 
+          "INPUTFORMAT" -> desc.storage.inputFormat.get,
+          "OUTPUTFORMAT" -> desc.storage.outputFormat.get)
+    sparkDDL.append(fmtProperties(map))
+
+    sparkDDL
       .append(fmtPartitionColumnNames(desc.partitionColumnNames))
       .append(fmtLocation(desc.storage.locationUri))
     (desc,sparkDDL.toString)

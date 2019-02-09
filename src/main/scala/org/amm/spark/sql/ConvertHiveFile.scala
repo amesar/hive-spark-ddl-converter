@@ -26,7 +26,6 @@ object ConvertHiveFile {
     println(s"==== SparkDDL:\n\n$sparkDDL")
 
     if (opts.parseSpark) {
-      //val sparkDDL2 = HiveToSparkDdlConverter.getTableDesc(sparkDDL)
       val sparkDDL2 = HiveToSparkDdlConverter.convert(sparkDDL,opts.verbose)
       println(s"==== sparkDDL2:\n$sparkDDL2")
     }

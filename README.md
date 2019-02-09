@@ -72,5 +72,6 @@ hiveFile:    src/test/resources/hive_ddl/ok/simple_orc.ddl
 
 * [LanguageManual DDL - Hive documentation](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL)
 * [Create Table - Databricks documentation](https://docs.databricks.com/spark/latest/spark-sql/language-manual/create-table.html)
+  * [Create Table with Hive format](https://docs.databricks.com/spark/latest/spark-sql/language-manual/create-table.html#create-table-with-hive-format)
 * [Create Table Statement - Cloudera Documentation](https://www.cloudera.com/documentation/enterprise/6/6.1/topics/impala_create_table.html)
 
