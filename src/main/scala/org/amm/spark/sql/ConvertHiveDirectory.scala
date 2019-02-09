@@ -5,23 +5,24 @@ import scala.io.Source
 import org.apache.spark.sql.SparkSession
 
 object ConvertHiveDirectory {
-  val verbose = false
 
   def main(args: Array[String]) {
     if (args.size < 3) {
-      println("ERROR: Expecting HIVE_DDL_DIRECTORY SPARK_DDL_OUTPUT_DIRECTORY EXTENSION")
+      println("ERROR: Expecting HIVE_DDL_DIRECTORY SPARK_DDL_OUTPUT_DIRECTORY EXTENSION VERBOSE")
       System.exit(1)
     }
-    convert(args(0), args(1),  args(2))
+    val verbose = if (args.size > 3) args(3).toBoolean else false
+    convert(args(0), args(1),  args(2), verbose)
   }
 
-  def convert(hiveDirname: String, sparkDirname: String, extension: String) {
+  def convert(hiveDirname: String, sparkDirname: String, extension: String, verbose: Boolean) {
     val hiveDir = new File(hiveDirname)
     val sparkDir = new File(sparkDirname)
     println("Arguments:")
     println(s"  hiveDir: $hiveDir")
     println(s"  sparkDir: $sparkDir")
     println(s"  extension: $extension")
+    println(s"  verbose: $verbose")
     if (!hiveDir.exists) {
       throw new java.io.FileNotFoundException(s"$hiveDir does not exist")
     }

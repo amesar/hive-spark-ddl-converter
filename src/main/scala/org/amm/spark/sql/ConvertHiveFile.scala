@@ -5,14 +5,15 @@ import scala.io.Source
 import org.apache.spark.sql.SparkSession
 
 object ConvertHiveFile {
-  val verbose = false
   def main(args: Array[String]) {
     if (args.size < 1) {
-      println("ERROR: Expecting HIVE_DDL_FILE SPARK_DDL_OUTPUT_DIRECTORY")
+      println("ERROR: Expecting HIVE_DDL_FILE SPARK_DDL_OUTPUT_DIRECTORY VERBOSE")
       System.exit(1)
     }
     val hivePath = args(0)
     val sparkOutputDir = if (args.size > 1) args(1) else "."
+    val verbose = if (args.size > 2) args(2).toBoolean else false
+
     val spark = SparkSession.builder().appName("ConvertHiveFile").getOrCreate()
     println(s"spark.version: ${spark.version}")
     println(s"hiveDdlPath: $hivePath")
