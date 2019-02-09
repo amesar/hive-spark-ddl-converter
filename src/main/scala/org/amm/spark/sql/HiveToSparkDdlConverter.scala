@@ -16,7 +16,7 @@ object HiveToSparkDdlConverter {
     "parquet.hive.serde.ParquetHiveSerDe" -> "PARQUET", // hive 12
     "org.apache.hadoop.hive.ql.io.orc.OrcSerde" -> "ORC",
     "org.apache.hadoop.hive.serde2.OpenCSVSerde" -> "CSV"
-    //"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe" -> "FOO"
+    //"org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe" -> "TODO"
   )
 
   def getTableDesc(sql: String): CatalogTable = {
@@ -27,10 +27,21 @@ object HiveToSparkDdlConverter {
   }
 
   def fmtUsing(serde: Option[String], provider: Option[String], serdeMap: Map[String,String]) : String = {
+    val opt = _fmtUsing(serde, provider, serdeMap)
+    opt match {
+      case Some(s) => "USING "+s+"\n"
+      case None => ""
+    }
+  }
+
+  def _fmtUsing(serde: Option[String], provider: Option[String], serdeMap: Map[String,String]) : Option[String] = {
     serde match {
       case Some(serde)  => { 
+        if (serde == "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe") {
+          return None
+        }
         serdeMap.get(serde) match {
-          case Some(format) => return format
+          case Some(format) => return Some(format)
           case None => throw new Exception(s"Unknown FORMAT SERDE: $serde")
         }
       }
@@ -38,7 +49,8 @@ object HiveToSparkDdlConverter {
         provider match {
           case Some(a) => {
             a match {
-              case s if s.contains("csv") => "CSV"
+              case "HIVE" => Some("HIVE")
+              case "org.apache.hadoop.hive.serde2.OpenCSVSerde" => Some("CSV")
               case _ => throw new Exception(s"Unknown Provider $provider") // TODO
             }}
           case None => throw new Exception(s"No Provider") // TODO
@@ -48,10 +60,10 @@ object HiveToSparkDdlConverter {
   }
 
   def fmtLocation(str: Option[java.net.URI]) = {
-      str match {
-        case Some(x) => s"LOCATION '$x'\n"
-        case None => ""
-      }
+    str match {
+      case Some(x) => s"LOCATION '$x'\n"
+      case None => ""
+    }
   }
   
   def fmtColumns(schema: StructType) = {
@@ -64,6 +76,13 @@ object HiveToSparkDdlConverter {
 
   def fmtPartitionColumnNames(columns:  Seq[String]) = {
     if (columns == Seq.empty) "" else "PARTITIONED BY (" + columns.mkString(", ") + ")\n"
+  }
+
+  def fmtComment(comment: Option[String]) = {
+    comment match {
+      case Some(x) => s"COMMENT '$x'\n"
+      case None => ""
+    }
   }
 
   def readSerdeMap(path: String) = {
@@ -80,7 +99,9 @@ object HiveToSparkDdlConverter {
     }
     val sparkDDL = new StringBuilder(s"CREATE table IF NOT EXISTS ${desc.identifier} ")
       .append("(\n"+fmtColumns(desc.schema)+")\n")
-      .append("USING "+fmtUsing(desc.storage.serde,desc.provider,serdeMap)+"\n")
+      .append(fmtComment(desc.comment))
+      .append(fmtUsing(desc.storage.serde,desc.provider,serdeMap))
+      //.append("USING "+fmtUsing(desc.storage.serde,desc.provider,serdeMap)+"\n")
       .append(fmtProperties(desc.storage.properties))
       .append(fmtPartitionColumnNames(desc.partitionColumnNames))
       .append(fmtLocation(desc.storage.locationUri))

@@ -1,7 +1,8 @@
 # hive-spark-ddl-converter
 
 Converts Hive DDL to Spark DDL.
-This is an informatl first-pass Hive-to-Spark DDL converter that converts a subset ot Hive DDL to Spark DDL.
+
+This is an exploratory first-pass Hive-to-Spark DDL converter that translates a subset of Hive DDL to Spark DDL.
 
 ## Build
 
